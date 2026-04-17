@@ -1,5 +1,7 @@
 FROM fedora:rawhide
 
+LABEL maintainer="Douman <douman@gmx.se>"
+
 ARG INSTALLATION_TYPE
 
 ENV RUSTUP_HOME=/usr/local/rustup \
