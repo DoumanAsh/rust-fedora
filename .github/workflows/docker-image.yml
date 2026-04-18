@@ -119,8 +119,10 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
             ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:${{ steps.determine_type.outputs.tag_suffix }}latest
+            ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:${{ steps.determine_type.outputs.tag_suffix }}fedora${{env.LATEST_FEDORA_VER}}
             ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:${{ steps.test.outputs.rustc_version }}-${{ steps.determine_type.outputs.tag_suffix }}fedora${{env.LATEST_FEDORA_VER}}
             ${{ env.GITHUB_REGISTRY }}/${{ env.GITHUB_IMAGE_NAME }}:${{ steps.determine_type.outputs.tag_suffix }}latest
+            ${{ env.GITHUB_REGISTRY }}/${{ env.GITHUB_IMAGE_NAME }}:${{ steps.determine_type.outputs.tag_suffix }}fedora${{env.LATEST_FEDORA_VER}}
             ${{ env.GITHUB_REGISTRY }}/${{ env.GITHUB_IMAGE_NAME }}:${{ steps.test.outputs.rustc_version }}-${{ steps.determine_type.outputs.tag_suffix }}fedora${{env.LATEST_FEDORA_VER}}
 
   build-version:
