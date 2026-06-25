@@ -64,6 +64,7 @@ jobs:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v4
         with:
+          cache-image: false
           platforms: arm64
 
       - name: Setup Docker buildx
@@ -162,6 +163,7 @@ jobs:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v4
         with:
+          cache-image: false
           platforms: arm64
 
       - name: Setup Docker buildx
