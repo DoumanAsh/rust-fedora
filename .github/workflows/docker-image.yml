@@ -21,7 +21,7 @@ on:
       - 'root/**/*'
 
 env:
-  LATEST_FEDORA_VER: 43
+  LATEST_FEDORA_VER: 44
   DOCKER_REGISTRY: docker.io
   GITHUB_REGISTRY: ghcr.io
   DOCKER_IMAGE_NAME: douman/rust-fedora
@@ -134,7 +134,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        fedora: [42, 44, rawhide]
+        fedora: [42, 43, rawhide]
         build-type: ["native", "rustup"]
 
     steps:
