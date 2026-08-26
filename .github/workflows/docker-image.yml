@@ -49,11 +49,9 @@ jobs:
           BUILD_TYPE: ${{ matrix.build-type }}
         run: |
           if [[ "$BUILD_TYPE" == "native" ]]; then
-              echo "::notice ::Native package"
               echo "tag_suffix=" >> "$GITHUB_OUTPUT"
               echo "install_type=native" >> "$GITHUB_OUTPUT"
           elif [[ "$BUILD_TYPE" == "rustup" ]]; then
-              echo "::notice ::Rustup package"
               echo "tag_suffix=rustup-" >> "$GITHUB_OUTPUT"
               echo "install_type=rustup" >> "$GITHUB_OUTPUT"
           else
@@ -109,7 +107,6 @@ jobs:
         run: |
           echo '## Build docker Fedora ${{ env.LATEST_FEDORA_VER }} image 🚀' >> $GITHUB_STEP_SUMMARY
           VERSION=$(docker run --rm ${{ env.DOCKER_IMAGE_NAME }}:${{ steps.determine_type.outputs.tag_suffix }}latest rustc --version | cut -d" " -f2)
-          echo "::notice ::Rust version $VERSION"
           echo "rustc_version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "- Rustc version: $VERSION" >> $GITHUB_STEP_SUMMARY
           echo "- Type: ${{ matrix.build-type }}" >> $GITHUB_STEP_SUMMARY
@@ -156,11 +153,9 @@ jobs:
           BUILD_TYPE: ${{ matrix.build-type }}
         run: |
           if [[ "$BUILD_TYPE" == "native" ]]; then
-              echo "::notice ::Native package"
               echo "tag_suffix=" >> "$GITHUB_OUTPUT"
               echo "install_type=native" >> "$GITHUB_OUTPUT"
           elif [[ "$BUILD_TYPE" == "rustup" ]]; then
-              echo "::notice ::Rustup package"
               echo "tag_suffix=rustup-" >> "$GITHUB_OUTPUT"
               echo "install_type=rustup" >> "$GITHUB_OUTPUT"
           else
