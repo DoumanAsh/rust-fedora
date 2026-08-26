@@ -1,4 +1,5 @@
-FROM fedora:rawhide
+ARG FEDORA_VERSION
+FROM fedora:$FEDORA_VERSION
 
 LABEL maintainer="Douman <douman@gmx.se>"
 

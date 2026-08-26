@@ -93,8 +93,10 @@ jobs:
         env:
           DOCKER_BUILD_SUMMARY: false
         with:
-          file: Dockerfile.${{ env.LATEST_FEDORA_VER }}
-          build-args: "INSTALLATION_TYPE=${{steps.determine_type.outputs.install_type}}"
+          file: Dockerfile
+          build-args: |
+            INSTALLATION_TYPE=${{steps.determine_type.outputs.install_type}}
+            FEDORA_VERSION=${{ env.LATEST_FEDORA_VER }}
           context: .
           platforms: linux/amd64
           load: true
@@ -116,9 +118,11 @@ jobs:
         id: push-docker
         uses: docker/build-push-action@v7
         with:
+          file: Dockerfile
+          build-args: |
+            INSTALLATION_TYPE=${{steps.determine_type.outputs.install_type}}
+            FEDORA_VERSION=${{ env.LATEST_FEDORA_VER }}
           context: .
-          build-args: "INSTALLATION_TYPE=${{steps.determine_type.outputs.install_type}}"
-          file: Dockerfile.${{ env.LATEST_FEDORA_VER }}
           platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
@@ -197,9 +201,11 @@ jobs:
         env:
           DOCKER_BUILD_SUMMARY: false
         with:
+          file: Dockerfile
+          build-args: |
+            INSTALLATION_TYPE=${{steps.determine_type.outputs.install_type}}
+            FEDORA_VERSION=${{ matrix.fedora }}
           context: .
-          build-args: "INSTALLATION_TYPE=${{steps.determine_type.outputs.install_type}}"
-          file: Dockerfile.${{ matrix.fedora }}
           platforms: linux/amd64
           load: true
           tags: |
@@ -222,8 +228,10 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           context: .
-          build-args: "INSTALLATION_TYPE=${{steps.determine_type.outputs.install_type}}"
-          file: Dockerfile.${{ matrix.fedora }}
+          build-args: |
+            INSTALLATION_TYPE=${{steps.determine_type.outputs.install_type}}
+            FEDORA_VERSION=${{ matrix.fedora }}
+          file: Dockerfile
           platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
