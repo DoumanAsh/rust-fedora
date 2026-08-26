@@ -92,6 +92,8 @@ jobs:
       - name: Build Docker image
         id: build-docker
         uses: docker/build-push-action@v7
+        env:
+          DOCKER_BUILD_SUMMARY: false
         with:
           file: Dockerfile.${{ env.LATEST_FEDORA_VER }}
           build-args: "INSTALLATION_TYPE=${{steps.determine_type.outputs.install_type}}"
@@ -105,9 +107,13 @@ jobs:
       - name: Test version
         id: test
         run: |
+          echo '## Build docker Fedora ${{ env.LATEST_FEDORA_VER }} image 🚀' >> $GITHUB_STEP_SUMMARY
           VERSION=$(docker run --rm ${{ env.DOCKER_IMAGE_NAME }}:${{ steps.determine_type.outputs.tag_suffix }}latest rustc --version | cut -d" " -f2)
           echo "::notice ::Rust version $VERSION"
           echo "rustc_version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "- Rustc version: $VERSION" >> $GITHUB_STEP_SUMMARY
+          echo "- Type: ${{ matrix.build-type }}" >> $GITHUB_STEP_SUMMARY
+          echo "rustc_short_version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Push Docker image
         id: push-docker
@@ -121,9 +127,11 @@ jobs:
           tags: |
             ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:${{ steps.determine_type.outputs.tag_suffix }}latest
             ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:${{ steps.determine_type.outputs.tag_suffix }}fedora${{env.LATEST_FEDORA_VER}}
+            ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:${{ steps.test.outputs.rustc_short_version }}-${{ steps.determine_type.outputs.tag_suffix }}fedora${{env.LATEST_FEDORA_VER}}
             ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:${{ steps.test.outputs.rustc_version }}-${{ steps.determine_type.outputs.tag_suffix }}fedora${{env.LATEST_FEDORA_VER}}
             ${{ env.GITHUB_REGISTRY }}/${{ env.GITHUB_IMAGE_NAME }}:${{ steps.determine_type.outputs.tag_suffix }}latest
             ${{ env.GITHUB_REGISTRY }}/${{ env.GITHUB_IMAGE_NAME }}:${{ steps.determine_type.outputs.tag_suffix }}fedora${{env.LATEST_FEDORA_VER}}
+            ${{ env.GITHUB_REGISTRY }}/${{ env.GITHUB_IMAGE_NAME }}:${{ steps.test.outputs.rustc_short_version }}-${{ steps.determine_type.outputs.tag_suffix }}fedora${{env.LATEST_FEDORA_VER}}
             ${{ env.GITHUB_REGISTRY }}/${{ env.GITHUB_IMAGE_NAME }}:${{ steps.test.outputs.rustc_version }}-${{ steps.determine_type.outputs.tag_suffix }}fedora${{env.LATEST_FEDORA_VER}}
 
   build-version:
@@ -191,6 +199,8 @@ jobs:
       - name: Build Docker image
         id: build-docker
         uses: docker/build-push-action@v7
+        env:
+          DOCKER_BUILD_SUMMARY: false
         with:
           context: .
           build-args: "INSTALLATION_TYPE=${{steps.determine_type.outputs.install_type}}"
@@ -204,9 +214,13 @@ jobs:
       - name: Test version
         id: test
         run: |
+          echo '## Build docker Fedora ${{ matrix.fedora }} image 🚀' >> $GITHUB_STEP_SUMMARY
           VERSION=$(docker run --rm ${{ env.DOCKER_IMAGE_NAME }}:${{ steps.determine_type.outputs.tag_suffix }}fedora${{ matrix.fedora }} rustc --version | cut -d" " -f2)
-          echo "::notice ::Rust version $VERSION"
           echo "rustc_version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "- Rustc version: $VERSION" >> $GITHUB_STEP_SUMMARY
+          echo "- Type: ${{ matrix.build-type }}" >> $GITHUB_STEP_SUMMARY
+          VERSION=$(echo "$VERSION" | cut -d"." -f 1,2)
+          echo "rustc_short_version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Push Docker image
         id: push-docker
@@ -219,6 +233,8 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: |
             ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:${{ steps.determine_type.outputs.tag_suffix }}fedora${{ matrix.fedora }}
+            ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:${{ steps.test.outputs.rustc_short_version }}-${{ steps.determine_type.outputs.tag_suffix }}fedora${{ matrix.fedora }}
             ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:${{ steps.test.outputs.rustc_version }}-${{ steps.determine_type.outputs.tag_suffix }}fedora${{ matrix.fedora }}
             ${{ env.GITHUB_REGISTRY }}/${{ env.GITHUB_IMAGE_NAME }}:${{ steps.determine_type.outputs.tag_suffix }}fedora${{ matrix.fedora }}
+            ${{ env.GITHUB_REGISTRY }}/${{ env.GITHUB_IMAGE_NAME }}:${{ steps.test.outputs.rustc_short_version }}-${{ steps.determine_type.outputs.tag_suffix }}fedora${{ matrix.fedora }}
             ${{ env.GITHUB_REGISTRY }}/${{ env.GITHUB_IMAGE_NAME }}:${{ steps.test.outputs.rustc_version }}-${{ steps.determine_type.outputs.tag_suffix }}fedora${{ matrix.fedora }}
