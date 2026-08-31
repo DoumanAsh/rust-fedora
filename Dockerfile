@@ -1,4 +1,4 @@
-ARG FEDORA_VERSION
+ARG FEDORA_VERSION=latest
 FROM fedora:$FEDORA_VERSION
 
 LABEL maintainer="Douman <douman@gmx.se>"

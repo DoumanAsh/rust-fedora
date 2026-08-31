@@ -7,7 +7,7 @@ on:
   push:
     paths:
       - '.github/workflows/docker-image.yml'
-      - 'Dockerfile.*'
+      - 'Dockerfile'
       - 'root/**/*'
     branches:
       - master
@@ -17,7 +17,7 @@ on:
       - '**'
     paths:
       - '.github/workflows/docker-image.yml'
-      - 'Dockerfile.*'
+      - 'Dockerfile'
       - 'root/**/*'
 
 env:
