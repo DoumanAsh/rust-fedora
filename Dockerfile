@@ -7,11 +7,10 @@ ARG INSTALLATION_TYPE
 
 ENV RUSTUP_HOME=/usr/local/rustup \
     CARGO_HOME=/usr/local/cargo \
-    PATH=/usr/local/cargo/bin:$PATH
+    PATH=/usr/local/cargo/bin:$PATH \
+    CMAKE_GENERATOR="Ninja"
 
-RUN dnf -y update && \
-    dnf -y upgrade && \
-    dnf -y install rust cargo; \
+RUN dnf -y install rust cargo cmake ninja; \
     if [ "${INSTALLATION_TYPE}" = "rustup" ]; then \
         dnf -y remove --no-autoremove  rust cargo ; \
         curl -fsSL -o rustup.sh https://sh.rustup.rs && \
