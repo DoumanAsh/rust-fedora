@@ -16,6 +16,10 @@ RUN dnf -y install rust cargo cmake ninja; \
         curl -fsSL -o rustup.sh https://sh.rustup.rs && \
         chmod +x rustup.sh && \
         ./rustup.sh -y --profile minimal && \
+        find $RUSTUP_HOME -type f -executable -exec strip --strip-unneeded {} \; && \ 
+        find $RUSTUP_HOME -name *.so -exec strip --strip-unneeded {} \; && \
+        find $RUSTUP_HOME -name *.rlib -exec strip -d {} \; && \ 
+        find $RUSTUP_HOME -name *.a -exec strip -d {} \; && \
         rm -f rustup.sh; \
     fi && \
     dnf clean all
