@@ -2,6 +2,7 @@
 
 [![Build](https://github.com/DoumanAsh/rust-fedora/actions/workflows/docker-image.yml/badge.svg)](https://github.com/DoumanAsh/rust-fedora/actions/workflows/docker-image.yml)
 [![Hub](https://img.shields.io/badge/Docker-Hub-2496ed.svg)](https://hub.docker.com/r/douman/rust-fedora/tags)
+[![Quay](https://img.shields.io/badge/quay.io-douman%2Frust--fedora-blue)](https://quay.io/repository/doumanash/rust-fedora)
 
 Minimal Rust container backed by fedora
 
