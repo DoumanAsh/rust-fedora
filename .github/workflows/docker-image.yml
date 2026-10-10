@@ -113,7 +113,53 @@ jobs:
           tags: |
             ${{ env.DOCKER_IMAGE_NAME }}:${{ steps.determine_type.outputs.tag_suffix }}latest
 
-      - name: Test version
+      - name: Run vulnerability scanner
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: "${{ env.DOCKER_IMAGE_NAME }}:${{ steps.determine_type.outputs.tag_suffix }}latest"
+          format: 'json'
+          vuln-type: 'os,library'
+          severity: 'LOW,MEDIUM,HIGH,CRITICAL'
+          cache: 'false'
+          output: 'trivy.json'
+          version: latest
+          exit-code: 0
+
+      - name: Generate trivy.html fragment
+        shell: bash
+        env:
+          TRIVY_JSON: trivy.json
+        run: |
+          echo '<h3>Summary</h3>' >> trivy.html
+          jq -r '
+            [.Results[]?.Vulnerabilities[]? | select(.Severity != null)] as $vulns
+            | if ($vulns | length) == 0 then
+                "<p>No vulnerabilities found ✅</p>"
+              else
+                "<p>vulnerabilities found ⚠️</p>" +
+                "<ul>" + ($vulns | group_by(.Severity) | map("<li>\(.[0].Severity): \(length)</li>") | join("")) + "</ul>"
+              end
+          ' "$TRIVY_JSON" >> trivy.html
+
+          echo '<h3>Full list</h3>' >> trivy.html
+          echo '<table><thead><tr><th>Severity</th><th>PkgName</th><th>InstalledVersion</th><th>FixedVersion</th><th>Status</th><th>Title</th></tr></thead><tbody>' >> trivy.html
+          jq -r '.Results[]?.Vulnerabilities[]?|select(.Severity != null)|"<tr><td>\(.Severity//""|@html)</td><td>\(.PkgName//""|@html)</td><td>\(.InstalledVersion//""|@html)</td><td>\(.FixedVersion//""|@html)</td><td>\(.Status//""|@html)</td><td>\(.Title//""|@html)</td></tr>"' "$TRIVY_JSON" >> trivy.html
+          echo '</tbody></table>' >> trivy.html
+
+      - name: Paste Trivy report into github
+        if: github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v3
+        with:
+          # Pass html fragment as {{{content}}}
+          path: trivy.html
+          # Creates new comment deleting old one
+          recreate: true
+          message: |
+            ## Vulnerabilities report 🔓
+
+            {{{content}}}
+
+      - name: Test and generate summary
         id: test
         run: |
           echo '## Build docker Fedora ${{ env.LATEST_FEDORA_VER }} image 🚀' >> $GITHUB_STEP_SUMMARY
@@ -122,6 +168,8 @@ jobs:
           echo "- Rustc version: $VERSION" >> $GITHUB_STEP_SUMMARY
           echo "- Type: ${{ matrix.build-type }}" >> $GITHUB_STEP_SUMMARY
           echo "rustc_short_version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "## Vulnerabilities report 🔓" >> $GITHUB_STEP_SUMMARY
+          cat trivy.html >> $GITHUB_STEP_SUMMARY
 
       - name: Push Docker image
         id: push-docker
@@ -234,7 +282,53 @@ jobs:
           tags: |
             ${{ env.DOCKER_IMAGE_NAME }}:${{ steps.determine_type.outputs.tag_suffix }}fedora${{ matrix.fedora }}
 
-      - name: Test version
+      - name: Run vulnerability scanner
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: "${{ env.DOCKER_IMAGE_NAME }}:${{ steps.determine_type.outputs.tag_suffix }}fedora${{ matrix.fedora }}"
+          format: 'json'
+          vuln-type: 'os,library'
+          severity: 'LOW,MEDIUM,HIGH,CRITICAL'
+          cache: 'false'
+          output: 'trivy.json'
+          version: latest
+          exit-code: 0
+
+      - name: Generate trivy.html fragment
+        shell: bash
+        env:
+          TRIVY_JSON: trivy.json
+        run: |
+          echo '<h3>Summary</h3>' >> trivy.html
+          jq -r '
+            [.Results[]?.Vulnerabilities[]? | select(.Severity != null)] as $vulns
+            | if ($vulns | length) == 0 then
+                "<p>No vulnerabilities found ✅</p>"
+              else
+                "<p>vulnerabilities found ⚠️</p>" +
+                "<ul>" + ($vulns | group_by(.Severity) | map("<li>\(.[0].Severity): \(length)</li>") | join("")) + "</ul>"
+              end
+          ' "$TRIVY_JSON" >> trivy.html
+
+          echo '<h3>Full list</h3>' >> trivy.html
+          echo '<table><thead><tr><th>Severity</th><th>PkgName</th><th>InstalledVersion</th><th>FixedVersion</th><th>Status</th><th>Title</th></tr></thead><tbody>' >> trivy.html
+          jq -r '.Results[]?.Vulnerabilities[]?|select(.Severity != null)|"<tr><td>\(.Severity//""|@html)</td><td>\(.PkgName//""|@html)</td><td>\(.InstalledVersion//""|@html)</td><td>\(.FixedVersion//""|@html)</td><td>\(.Status//""|@html)</td><td>\(.Title//""|@html)</td></tr>"' "$TRIVY_JSON" >> trivy.html
+          echo '</tbody></table>' >> trivy.html
+
+      - name: Paste Trivy report into github
+        if: github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v3
+        with:
+          # Pass html fragment as {{{content}}}
+          path: trivy.html
+          # Creates new comment deleting old one
+          recreate: true
+          message: |
+            ## Vulnerabilities report 🔓
+
+            {{{content}}}
+
+      - name: Test and generate summary
         id: test
         run: |
           echo '## Build docker Fedora ${{ matrix.fedora }} image 🚀' >> $GITHUB_STEP_SUMMARY
@@ -244,6 +338,8 @@ jobs:
           echo "- Type: ${{ matrix.build-type }}" >> $GITHUB_STEP_SUMMARY
           VERSION=$(echo "$VERSION" | cut -d"." -f 1,2)
           echo "rustc_short_version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "## Vulnerabilities report 🔓" >> $GITHUB_STEP_SUMMARY
+          cat trivy.html >> $GITHUB_STEP_SUMMARY
 
       - name: Push Docker image
         id: push-docker
