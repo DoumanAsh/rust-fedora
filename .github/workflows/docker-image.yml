@@ -110,6 +110,8 @@ jobs:
           context: .
           platforms: linux/amd64
           load: true
+          sbom: false
+          provenance: false
           tags: |
             ${{ env.DOCKER_IMAGE_NAME }}:${{ steps.determine_type.outputs.tag_suffix }}latest
 
@@ -182,7 +184,8 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
-          sbom: ${{ github.event_name != 'pull_request' }}
+          sbom: false
+          provenance: false
           tags: |
             ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:${{ steps.determine_type.outputs.tag_suffix }}latest
             ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:${{ steps.determine_type.outputs.tag_suffix }}fedora${{env.LATEST_FEDORA_VER}}
@@ -279,6 +282,8 @@ jobs:
           context: .
           platforms: linux/amd64
           load: true
+          sbom: false
+          provenance: false
           tags: |
             ${{ env.DOCKER_IMAGE_NAME }}:${{ steps.determine_type.outputs.tag_suffix }}fedora${{ matrix.fedora }}
 
@@ -352,7 +357,8 @@ jobs:
           file: Dockerfile
           platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
-          sbom: ${{ github.event_name != 'pull_request' }}
+          sbom: false
+          provenance: false
           tags: |
             ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:${{ steps.determine_type.outputs.tag_suffix }}fedora${{ matrix.fedora }}
             ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_IMAGE_NAME }}:${{ steps.test.outputs.rustc_short_version }}-${{ steps.determine_type.outputs.tag_suffix }}fedora${{ matrix.fedora }}
