@@ -136,6 +136,7 @@ jobs:
           echo "rustc_version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "- Rustc version: $VERSION" >> $GITHUB_STEP_SUMMARY
           echo "- Type: ${{ matrix.build-type }}" >> $GITHUB_STEP_SUMMARY
+          VERSION=$(echo "$VERSION" | cut -d"." -f 1,2)
           echo "rustc_short_version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Check vulnerabilities
