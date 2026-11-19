@@ -6,6 +6,12 @@
 
 Minimal Rust container backed by fedora
 
+## Installed utilities
+
+- `cmake` generally tool you need to build C/C++ dependencies
+- `ninja` good alternative to make and used by `cmake` by default to speed up builds of your C/C++ dependencies
+- `cargo-auditable` CLI utility allows to embed dependencies into binary. Use `cargo auditable` in the same way as `cargo build`
+
 ## Tags
 
 - `latest` - Stable Fedora version with latest Rust available (no rustup)
