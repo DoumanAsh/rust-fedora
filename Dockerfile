@@ -4,6 +4,7 @@ FROM quay.io/fedora/fedora:$FEDORA_VERSION
 LABEL maintainer="Douman <douman@gmx.se>"
 
 ARG INSTALLATION_TYPE
+ARG CARGO_AUDITABLE=0.7.7
 
 ENV RUSTUP_HOME=/usr/local/rustup \
     CARGO_HOME=/usr/local/cargo \
@@ -21,5 +22,7 @@ RUN dnf -y install rust cargo cmake ninja; \
         find $RUSTUP_HOME -name *.rlib -exec strip -d {} \; && \ 
         find $RUSTUP_HOME -name *.a -exec strip -d {} \; && \
         rm -f rustup.sh; \
-    fi && \
+    fi ;\
+    cargo install --version $CARGO_AUDITABLE --config 'profile.release.strip=true' --config 'profile.release.lto=true' cargo-auditable ;\
+    rm -rf ~/.cargo/registry ~/.cargo/git ;\
     dnf clean all
