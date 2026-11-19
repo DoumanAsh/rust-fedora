@@ -23,6 +23,15 @@ RUN dnf -y install rust cargo cmake ninja; \
         find $RUSTUP_HOME -name *.a -exec strip -d {} \; && \
         rm -f rustup.sh; \
     fi ;\
-    cargo install --version $CARGO_AUDITABLE --config 'profile.release.strip=true' --config 'profile.release.lto=true' cargo-auditable ;\
-    rm -rf ~/.cargo/registry ~/.cargo/git ;\
+    systemArch="$(uname -m)"; \
+    case "$systemArch" in \
+        x86_64) rustArch='x86_64-unknown-linux-musl' ;; \
+        aarch64) rustArch='aarch64-unknown-linux-musl' ;; \
+        *) echo >&2 "unsupported architecture: $systemArch"; exit 1 ;; \
+    esac; \
+    mkdir -p $CARGO_HOME/bin ;\
+    curl -L -o /tmp/cargo-auditable-${rustArch}.tar.xz  https://github.com/rust-secure-code/cargo-auditable/releases/download/v$CARGO_AUDITABLE/cargo-auditable-${rustArch}.tar.xz ;\
+    tar -xf /tmp/cargo-auditable-${rustArch}.tar.xz -C $CARGO_HOME/bin/ --strip-components=1 cargo-auditable-${rustArch}/cargo-auditable ;\
+    rm /tmp/cargo-auditable-${rustArch}.tar.xz ;\
+    chmod +x $CARGO_HOME/bin/cargo-auditable ;\
     dnf clean all
