@@ -138,6 +138,8 @@ jobs:
           echo "- Type: ${{ matrix.build-type }}" >> $GITHUB_STEP_SUMMARY
           VERSION=$(echo "$VERSION" | cut -d"." -f 1,2)
           echo "rustc_short_version=$VERSION" >> "$GITHUB_OUTPUT"
+          VERSION=$(docker run --rm ${{ env.DOCKER_IMAGE_NAME }}:${{ steps.determine_type.outputs.tag_suffix }}latest cargo auditable --version | cut -d" " -f2)
+          echo "- cargo-auditable: $VERSION" >> $GITHUB_STEP_SUMMARY
 
       - name: Check vulnerabilities
         uses: DoumanAsh/douman-ci/.github/actions/trivy-report-vuln@master
@@ -273,6 +275,8 @@ jobs:
           echo "- Type: ${{ matrix.build-type }}" >> $GITHUB_STEP_SUMMARY
           VERSION=$(echo "$VERSION" | cut -d"." -f 1,2)
           echo "rustc_short_version=$VERSION" >> "$GITHUB_OUTPUT"
+          VERSION=$(docker run --rm ${{ env.DOCKER_IMAGE_NAME }}:${{ steps.determine_type.outputs.tag_suffix }}fedora${{ matrix.fedora }} cargo auditable --version | cut -d" " -f2)
+          echo "- cargo-auditable: $VERSION" >> $GITHUB_STEP_SUMMARY
 
       - name: Check vulnerabilities
         uses: DoumanAsh/douman-ci/.github/actions/trivy-report-vuln@master
