@@ -29,7 +29,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        fedora: [42, 43, 44, 45, rawhide]
+        fedora: [42, 43, 44, 45]
         build-type: ["native", "rustup"]
     uses: DoumanAsh/douman-ci/.github/workflows/release-container.yaml@master
     secrets:
@@ -72,6 +72,7 @@ jobs:
               exit 1
           fi
 
+          echo "- Fedora: '$FEDORA'" >> $GITHUB_STEP_SUMMARY
           RUST_VERSION=$(podman run --rm localhost/${{ github.event.repository.name }} rustc --version | cut -d" " -f2)
           echo "- Rustc version: $RUST_VERSION" >> $GITHUB_STEP_SUMMARY
           echo "- Type: ${{ matrix.build-type }}" >> $GITHUB_STEP_SUMMARY
@@ -80,7 +81,7 @@ jobs:
           echo "- cargo-auditable: $CARGO_VERSION" >> $GITHUB_STEP_SUMMARY
 
           if [ "$FEDORA" = "45" ]; then
-            echo "tags=$tag_suffixlatest ${RUST_VERSION}-${tag_suffix}fedora$FEDORA ${RUST_SHORT_VERSION}-${tag_suffix}fedora$FEDORA ${tag_suffix}fedora$FEDORA" >> "$GITHUB_OUTPUT"
+            echo "tags=${tag_suffix}latest ${RUST_VERSION}-${tag_suffix}fedora$FEDORA ${RUST_SHORT_VERSION}-${tag_suffix}fedora$FEDORA ${tag_suffix}fedora$FEDORA" >> "$GITHUB_OUTPUT"
           else
             echo "tags=${RUST_VERSION}-${tag_suffix}fedora$FEDORA ${RUST_SHORT_VERSION}-${tag_suffix}fedora$FEDORA ${tag_suffix}fedora$FEDORA" >> "$GITHUB_OUTPUT"
           fi
